@@ -1,64 +1,68 @@
 <template>
-  <div class="root-layout">
+  <el-container >
     <!-- 左侧导航栏 -->
-    <div class="sidebar">
-      <div class="top-buttons">
-        <el-button type="text" :icon="Menu" circle class="icon-button" />
-        <el-button type="text" :icon="MagicStick" circle class="icon-button" />
-      </div>
-      <div class="bottom-buttons">
-        <el-button type="text" :icon="User" circle class="icon-button" />
-        <el-button type="text" :icon="Setting" circle class="icon-button" />
-      </div>
-    </div>
-
-    <!-- 右侧内容区域 -->
-    <div class="main-area">
-      <!-- 固定搜索栏 -->
-      <div class="search-header">
-        <el-input v-model="query" placeholder="查询 IP、Domain、HASH" class="search-input" />
-        <el-button type="primary" @click="search">查询</el-button>
-      </div>
-
-      <!-- 固定综合研判区 -->
-      <div class="summary-area">
-        <el-icon class="summary-icon">
-          <WarningFilled />
-        </el-icon>
-        <div class="summary-content">
-          <strong>综合研判</strong>
-          <p class="summary-text">{{ summary || '暂无分析数据。' }}</p>
-        </div>
-      </div>
-
-      <!-- 滚动内容区域 -->
-      <div class="scroll-content">
-        <div class="cards">
-          <intel-result-card v-for="item in results" :key="item.source" :data="item" />
-        </div>
-      </div>
-    </div>
-  </div>
+    <el-aside width="60px">
+      <el-menu default-active="1" class="el-menu-vertical-demo" collapse=true @open="handleOpen" @close="handleClose">
+        <el-menu-item index="1" @click="() => navigate('/ti-search')">
+          <el-icon>
+            <Search />
+          </el-icon>
+          <template #title>情报检索</template>
+        </el-menu-item>
+        <el-menu-item index="2" @click="() => navigate('/ti-source-config')">
+          <el-icon>
+            <Collection />
+          </el-icon>
+          <template #title>情报源</template>
+        </el-menu-item>
+        <el-menu-item index="3" @click="() => navigate('/ai-config')">
+          <el-icon>
+            <MagicStick />
+          </el-icon>
+          <template #title>AI</template>
+        </el-menu-item>
+        <el-menu-item index="4" @click="() => navigate('/user-profile')">
+          <el-icon>
+            <User />
+          </el-icon>
+          <template #title>用户</template>
+        </el-menu-item>
+        <el-menu-item index="5" @click="() => navigate('/app-settings')">
+          <el-icon>
+            <Setting />
+          </el-icon>
+          <template #title>设置</template>
+        </el-menu-item>
+        <el-menu-item index="6" @click="() => navigate('/about-app')">
+          <el-icon>
+            <Warning />
+          </el-icon>
+          <template #title>关于</template>
+        </el-menu-item>
+      </el-menu>
+    </el-aside>
+    <el-container>
+      <!-- 右侧内容区域 -->
+      <router-view />
+    </el-container>
+  </el-container>
 </template>
 
 <script setup>
 import { ref } from 'vue';
-import IntelResultCard from './components/IntelResultCard.vue';
-import { WarningFilled, Menu, MagicStick, User, Setting } from '@element-plus/icons-vue';
+import { Collection, MagicStick, User, Setting, Search, Warning } from '@element-plus/icons-vue';
 
-const query = ref('');
-const results = ref([]);
-const summary = ref('');
-
-const search = async () => {
-  const res = await window.electronAPI.fetchIntel(query.value);
-  results.value = res.results;
-  summary.value = res.summary;
+import { useRouter } from 'vue-router';
+const router = useRouter();
+const navigate = (path) => {
+  router.push(path);
 };
+
 </script>
 
 <style scoped>
-html, body {
+html,
+body {
   margin: 0;
   padding: 0;
   height: 100%;
@@ -73,96 +77,5 @@ html, body {
   right: 0;
   bottom: 0;
   display: flex;
-  background-color: #1e1e1e;
-  color: #fff;
-}
-
-.sidebar {
-  width: 60px;
-  background-color: #2c2c2c;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: 10px 0;
-  height: 100%-100px;
-  align-items: center;
-}
-.top-buttons, .bottom-buttons {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  align-items: center;
-  justify-content: center;
-}
-.icon-button :deep(.el-icon) {
-  font-size: 24px;
-}
-.el-button+.el-button {
-  /* width: 40px;
-  height: 40px;
-  background-color: transparent;
-  border: none;
-  color: #fff; */
-  margin: 0;
-}
-
-.main-area {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  overflow: hidden;
-}
-
-.search-header {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 20px;
-  background-color: #252526;
-  border-bottom: 1px solid #3a3a3a;
-  flex-shrink: 0;
-}
-
-.search-input {
-  flex: 1;
-}
-
-.summary-area {
-  display: flex;
-  align-items: center;
-  padding: 15px 20px;
-  background-color: #2e2e2e;
-  border-bottom: 1px solid #444;
-  flex-shrink: 0;
-}
-
-.summary-icon {
-  font-size: 36px;
-  margin-right: 20px;
-  color: #e6a23c;
-}
-
-.summary-content {
-  display: flex;
-  flex-direction: column;
-}
-
-.summary-text {
-  margin: 5px 0 0;
-  color: #ccc;
-}
-
-.scroll-content {
-  flex: 1;
-  overflow-y: auto;
-  padding: 20px;
-  background-color: #1e1e1e;
-}
-
-.cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 20px;
 }
 </style>
