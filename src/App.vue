@@ -3,13 +3,13 @@
     <!-- 左侧导航栏 -->
     <el-aside width="60px">
       <el-menu default-active="1" class="el-menu-vertical-demo" collapse=true @open="handleOpen" @close="handleClose">
-        <el-menu-item index="1" @click="() => navigate('/ti-search')">
+        <el-menu-item index="1" @click="() => navigate('/cti-search')">
           <el-icon>
             <Search />
           </el-icon>
           <template #title>情报检索</template>
         </el-menu-item>
-        <el-menu-item index="2" @click="() => navigate('/ti-source-config')">
+        <el-menu-item index="2" @click="() => navigate('/cti-source-config')">
           <el-icon>
             <Collection />
           </el-icon>
@@ -48,13 +48,13 @@
   </el-container>
 </template>
 
-<script setup>
+<script lang="ts" setup>
 import { ref } from 'vue';
 import { Collection, MagicStick, User, Setting, Search, Warning } from '@element-plus/icons-vue';
 
-import { useRouter } from 'vue-router';
+import { RouteLocationAsPathGeneric, RouteLocationAsRelativeGeneric, useRouter } from 'vue-router';
 const router = useRouter();
-const navigate = (path) => {
+const navigate = (path: string | RouteLocationAsRelativeGeneric | RouteLocationAsPathGeneric) => {
   router.push(path);
 };
 
