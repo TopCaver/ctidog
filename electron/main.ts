@@ -2,6 +2,8 @@ import { app, BrowserWindow, ipcMain } from 'electron'
 import { createRequire } from 'node:module'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
+import fetch from 'node-fetch'
+
 const require = createRequire(import.meta.url)
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -77,4 +79,59 @@ ipcMain.handle('fetch-intel', async (event, query) => {
     { source: 'AbuseIPDB', level: '低', detail: '历史记录为空' },
   ]
   return { summary: '该地址存在恶意行为，建议拦截。', results: mockData };
+});
+
+ipcMain.handle('query-nti-ip', async(_event,ip:string, apiKey:string) => {
+  try {
+    console.log('NTI 查询 IP：', ip, 'API Key：', apiKey);
+    const res = await fetch(`https://nti.nsfocus.com/api/v2/objects/ioc-ipv4/?query=${ip}`, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/nsfocus.nti.spec+json; version=2.0',
+        'X-Ns-Nti-Key': apiKey,
+        'Accept-Encoding': 'gzip'
+      }
+    });
+    
+    const data = await res.json();
+    console.log('NTI 查询结果：', data);
+    return { success: true, data };
+  } catch (err) {
+    console.error('NTI 查询失败：', err);
+    return { success: false, message: 'NTI 查询失败' };
+  }
+});
+
+ipcMain.handle('query-vt-ip', async (_event, ip: string, apiKey: string) => {
+  try {
+    const res = await fetch(`https://www.virustotal.com/api/v3/ip_addresses/${encodeURIComponent(ip)}`, {
+      method: 'GET',
+      headers: {
+        'accept': 'application/json',
+        'x-apikey': apiKey
+      }
+    });
+    const data = await res.json();
+    return { success: true, data };
+  } catch (err) {
+    console.error('VT 查询失败：', err);
+    return { success: false, message: 'VT 查询失败' };
+  }
+});
+
+ipcMain.handle('query-kaspersky-ip', async (_event, ip: string, apiKey: string) => {
+  try {
+    const url = `https://opentip.kaspersky.com/api/v1/search/ip?request=${encodeURIComponent(ip)}`;
+    const res = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'x-api-key': apiKey
+      }
+    });
+    const data = await res.json();
+    return { success: true, data };
+  } catch (err) {
+    console.error('Kaspersky 查询失败：', err);
+    return { success: false, message: 'Kaspersky 查询失败' };
+  }
 });

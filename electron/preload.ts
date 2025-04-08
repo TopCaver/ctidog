@@ -23,6 +23,10 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
   // ...
 })
 
-contextBridge.exposeInMainWorld('electronAPI', {
-  fetchIntel:(query:string) => ipcRenderer.invoke('fetch-intel', query)
+contextBridge.exposeInMainWorld('CtiDogAPI', {
+  fetchIntel:(query:string) => ipcRenderer.invoke('fetch-intel', query),
+  queryNtiIp: (ip: string, apiKey: string) => ipcRenderer.invoke('query-nti-ip', ip, apiKey),
+  queryVtIP: (ip: string, apiKey: string) => ipcRenderer.invoke('query-vt-ip', ip, apiKey),
+  queryKasperskyIP: (ip: string, apiKey: string) => ipcRenderer.invoke('query-kaspersky-ip', ip, apiKey)
+
 })
