@@ -67,6 +67,6 @@ export function useAIChat() {
 // 构造 Prompt 输入内容
 function buildPromptFromIntelList(intelList: any[]): string {
   return intelList.map(item => {
-    return `情报源：${item.source}\n摘要：${item.detail}`
+    return `情报源：${item.source}\n摘要：${item.summary}\n完整信息：${item.full}\n\n`
   }).join('\n\n')
 }
