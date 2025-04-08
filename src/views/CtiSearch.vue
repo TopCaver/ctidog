@@ -100,7 +100,7 @@ const search = async () => {
     resultsList.push({
       source: 'Kaspersky OpenTIP',
       level: kasResult.level,
-      detail: kasResult.summary,
+      summary: kasResult.summary,
       full: kasResult.full
     });
 
